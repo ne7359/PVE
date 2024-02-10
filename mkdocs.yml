@@ -1,9 +1,9 @@
 site_name: 国光的 PVE 环境搭建教程
-site_url: https://pve.sqlsec.com
+site_url: https://pve.leertai.top
 site_author: 国光
 site_description: "国光的 PVE 环境搭建教程"
-repo_name: sqlsec/PVE
-repo_url: https://github.com/sqlsec/PVE
+repo_name: ne7359/PVE
+repo_url: https://github.com/ne7359/PVE
 copyright: Copyright &copy;  国光
 theme:
   name: material
