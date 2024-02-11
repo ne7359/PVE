@@ -1,1 +1,1 @@
-[![](docs/imgs/cover.jpg)](https://pve.leertai.top/site/)
+[![](docs/imgs/cover.jpg)](https://pve.leertai.top/)
