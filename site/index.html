@@ -1,142 +1,615 @@
 
-<!doctype html><html lang=en-us><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="PVE 虚拟化黑苹果显卡直通教程（核显&amp;amp;独显通用），低延迟远程访问方案：VNC、ARD、ToDesk、ParSec、Jump Desktop 等远程桌面协议/软件测试横评
-"><meta name=keywords content="PVE,MacOS,Hackintosh,黑苹果"><title>PVE 虚拟化黑苹果显卡直通及远程访问教程</title><link rel=canonical href=https://blog.lv5.moe/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial><link rel=stylesheet href=/scss/style.min.css><script>function addLoadEvent(e){var t=window.onload;typeof window.onload!="function"?window.onload=e:window.onload=function(){t(),e()}}</script><meta property="og:title" content="PVE 虚拟化黑苹果显卡直通及远程访问教程"><meta property="og:description" content="PVE 虚拟化黑苹果显卡直通教程（核显&amp;amp;独显通用），低延迟远程访问方案：VNC、ARD、ToDesk、ParSec、Jump Desktop 等远程桌面协议/软件测试横评
-"><meta property="og:url" content="https://blog.lv5.moe/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial"><meta property="og:site_name" content="SSpiritsの秘密基地"><meta property="og:type" content="article"><meta property="article:section" content="Post"><meta property="article:tag" content="PVE"><meta property="article:tag" content="MacOS"><meta property="article:tag" content="Hackintosh"><meta property="article:tag" content="黑苹果"><meta property="article:published_time" content="2022-04-13T17:14:00+08:00"><meta property="article:modified_time" content="2022-11-19T13:47:22+08:00"><meta property="og:image" content="https://blog.lv5.moe/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial/hackintosh-logo.png"><meta name=twitter:title content="PVE 虚拟化黑苹果显卡直通及远程访问教程"><meta name=twitter:description content="PVE 虚拟化黑苹果显卡直通教程（核显&amp;amp;独显通用），低延迟远程访问方案：VNC、ARD、ToDesk、ParSec、Jump Desktop 等远程桌面协议/软件测试横评
-"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://blog.lv5.moe/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial/hackintosh-logo.png"><link rel="shortcut icon" href=/favicon.ico><script async defer data-website-id=3f278efc-35a9-46c8-8359-dcc0e76f7af3 src=https://a.lv5.moe/1650128973.js data-cache=true data-domains=blog.lv5.moe></script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-QNTL14TJQR"></script>
-<script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-QNTL14TJQR",{anonymize_ip:!1})}</script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex
-<!--
-extended
--->
-on-phone--column extended"><div id=article-toolbar><a href=https://blog.lv5.moe class=back-home><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="15 6 9 12 15 18"/></svg><span>Back</span></a></div><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
-<span class=hamburger-box><span class=hamburger-inner></span></span></button><header class=site-info><figure class=site-avatar><img src=/img/avatar_hu6d9469b8bfc8dfa514aef419be5b4fe8_57345_300x0_resize_q75_box.jpg width=300 height=299 class=site-logo loading=lazy alt=Avatar>
-<span class=emoji>🍥</span></figure><h1 class=site-name><a href=/>SSpiritsの秘密基地</a></h1><h2 class=site-description>わたし、気になります！</h2><ol class=social-menu><li><a href=mailto:admin@lv5.moe target=_blank title=Email><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-mail" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg></a></li><li><a href=https://github.com/ShadowySpirits target=_blank title=GitHub><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li></ol></header><ol class=menu id=main-menu><li><a href=/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg><span>Home</span></a></li><li><a href=/about><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg><span>About</span></a></li><li><a href=/archives><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg><span>Archives</span></a></li><li><a href=/search><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg><span>Search</span></a></li><li><a href=/index.xml><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-rss" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="5" cy="19" r="1"/><path d="M4 4a16 16 0 0116 16"/><path d="M4 11a9 9 0 019 9"/></svg><span>RSS</span></a></li><li id=dark-mode-toggle><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><span>Dark Mode</span></li></ol></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial><img src=/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial/hackintosh-logo.png width=857 height=350 loading=eager alt="Featured image of post PVE 虚拟化黑苹果显卡直通及远程访问教程"></a></div><div class=article-details><header class=article-category><a href=/categories/share style=background-color:green;color:#fff>杂七杂八的分享</a></header><h2 class=article-title><a href=/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial>PVE 虚拟化黑苹果显卡直通及远程访问教程</a></h2><h3 class=article-subtitle><p>PVE 虚拟化黑苹果显卡直通教程（核显&独显通用），低延迟远程访问方案：VNC、ARD、ToDesk、ParSec、Jump Desktop 等远程桌面协议/软件测试横评</p></h3><footer class=article-time><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg><time class=article-time--published>Apr 13, 2022</time></div><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg><time class=article-time--reading>7 minute read</time></div><div id=visitor-count><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-book" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 19a9 9 0 019 0 9 9 0 019 0"/><path d="M3 6a9 9 0 019 0 9 9 0 019 0"/><line x1="3" y1="6" x2="3" y2="19"/><line x1="12" y1="6" x2="12" y2="19"/><line x1="21" y1="6" x2="21" y2="19"/></svg><span id=/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial class=waline-visitor-count></span>&nbsp;visitors</div></footer></div></header><section class=article-content><p>PVE 虚拟化黑苹果显卡直通教程（核显&独显通用），低延迟远程访问方案：VNC、ARD、ToDesk、ParSec、Jump Desktop 等远程桌面协议/软件测试横评</p><h2 id=适用场景>适用场景</h2><p>博主曾经用笔记本装黑苹果做过一段时间的主力机，但是因为有使用 Windows 的强需求，双系统切换不方便所以最终换回的 Windows。当时就在想如果有一台服务器跑着 MacOS，随时可以从主力机 Windows 远程访问岂不是两全其美。但是近年矿潮显卡价格虚高，实在是没有入手的欲望，最近趁矿难显卡价格下跌入手一块 AMD RX460 实践一下这个想法</p><p>阅读本文需要的前置步骤：</p><ol><li>一台运行 PVE 的主机</li><li>在 PVE 上成功安装黑苹果（使用 ）</li><li>至少进入黑苹果一次开启 <code>设置->共享->屏幕共享</code>（显卡直通可能会导致 PVE 自带的 VNC 卡在白苹果界面）</li></ol><p>黑苹果能否成功运行和硬件以及驱动有很大的关系，而使用 PVE 使用的 KVM 虚拟化技术可以最大程度上屏蔽硬件的差异提高成功率，借助 <a class=link href=https://github.com/thenickdude/KVM-Opencore target=_blank rel=noopener>KVM-Opencore</a> 项目提供的驱动可以做到开箱即用，不用折腾</p><p>PVE 和黑苹果安装教程这里推荐两篇博客，写的非常详细</p><ul><li><a class=link href=https://www.nicksherlock.com/2021/10/installing-macos-12-monterey-on-proxmox-7 target=_blank rel=noopener>Installing macOS 12 “Monterey” on Proxmox 7</a></li><li><a class=link href=https://www.sqlsec.com/2022/04/pve.html target=_blank rel=noopener>国光的 PVE 生产环境配置优化记录</a></li></ul><p></p><div class="tip inlineBlock warning">对于国光这篇文章有一处勘误，文章中说到 PVE 7.1 不能显卡直通，实际上我测试是可以的，读者可以在下文中找到我使用的软件版本</div><p></p><h2 id=主要配置>主要配置</h2><h3 id=硬件配置>硬件配置</h3><p>CPU: i5 10400<br>GPU: UHD630、AMD RX460</p><p>其他硬件均虚拟化</p><h3 id=软件版本>软件版本</h3><p>虚拟化平台：PVE</p><p>主要软件包版本：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>~ pveversion -v
-</span></span><span class=line><span class=cl>proxmox-ve: 7.1-1 <span class=o>(</span>running kernel: 5.13.19-6-pve<span class=o>)</span>
-</span></span><span class=line><span class=cl>pve-manager: 7.1-12 <span class=o>(</span>running version: 7.1-12/b3c09de3<span class=o>)</span>
-</span></span><span class=line><span class=cl>pve-kernel-helper: 7.1-14
-</span></span><span class=line><span class=cl>pve-kernel-5.13: 7.1-9
-</span></span><span class=line><span class=cl>...
-</span></span></code></pre></div><p>MacOS 版本：macOS Monterey 12.3.1(21E258)（使用 <a class=link href=https://github.com/thenickdude/OSX-KVM target=_blank rel=noopener>OSX-KVM</a> 项目制作镜像）<br>OpenCore&EFI 版本：<a class=link href=https://github.com/thenickdude/KVM-Opencore/releases/tag/v16 target=_blank rel=noopener>KVM-Opencore v16</a></p><h2 id=显卡直通>显卡直通</h2><p>因为我是通过远程访问使用黑苹果，所以并没有把要直通的 GPU 设置为主 GPU，这是本文和其他直通教程的主要区别。这样做的好处是可以用 PVE 的后台直接查看黑苹果启动情况、进入 Recovery 模式等</p><p>参考 <a class=link href=https://wiki.archlinux.org/title/PCI_passthrough_via_OVMF_%28%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%29 target=_blank rel=noopener>Arch Linux wiki</a></p><h3 id=启用-iommu>启用 IOMMU</h3><p>这里引用 Arch Linux wiki 中对 IOMMU 的介绍：</p><blockquote><p>IOMMU 是 Intel VT-d 和 AMD-Vi 的通用名称。<br>VT-d 指的是直接输入/输出虚拟化(Intel Virtualization Technology for Directed I/O)，不应与 VT-x(x86 平台下的 Intel 虚拟化技术，Intel Virtualization Technology)混淆。VT-x 可以让一个硬件平台作为多个“虚拟”平台，而 VT-d 提高了虚拟化的安全性、可靠性和 I/O 性能。</p></blockquote><p>首先在 BIOS 中开启 VT-d</p><p>然后修改内核参数开启 IOMMU：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-diff data-lang=diff><span class=line><span class=cl><span class=gd>- GRUB_CMDLINE_LINUX_DEFAULT=&#34;quiet&#34;
-</span></span></span><span class=line><span class=cl><span class=gd></span><span class=gi>+ GRUB_CMDLINE_LINUX_DEFAULT=&#34;quiet intel_iommu=on iommu=pt pcie_acs_override=downstream video=efifb:off&#34;
-</span></span></span></code></pre></div><p>这里解释下这几个参数的作用：</p><ul><li>intel_iommu=on：开启 IOMMU，对于 AMD CPU 需要使用 amd_iommu=on</li><li>iommu=pt：pt 是 passthrough 的缩写，可以提高性能</li><li>pcie_acs_override=downstream: 可以将同一 Group 中的设备分开直通</li><li>video=efifb:off：禁用 efifb 驱动，防止出现报错 BAR 3: cannot reserve [mem]</li></ul><p>更新内核参数</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>update-grub
-</span></span></code></pre></div><p>重启后可以用以下脚本测试</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>bash -c <span class=s2>&#34;</span><span class=k>$(</span>curl -fsSL https://gist.githubusercontent.com/ShadowySpirits/018ea8675100baf768afff0d835e7862/raw/8e1c12f5766f0d308628ad1373b2f8603c523480/check_iommu.sh<span class=k>)</span><span class=s2>&#34;</span>
-</span></span></code></pre></div><p>如果你遇到网络问题可以直接复制并执行以下脚本内容：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bas data-lang=bas><span class=line><span class=cl><span class=err>#</span><span class=o>!/</span><span class=vg>bin</span><span class=o>/</span><span class=vg>bash</span>
-</span></span><span class=line><span class=cl><span class=vg>shopt</span><span class=w> </span><span class=o>-</span><span class=vg>s</span><span class=w> </span><span class=vg>nullglob</span>
-</span></span><span class=line><span class=cl><span class=vg>for</span><span class=w> </span><span class=vg>g</span><span class=w> </span><span class=vg>in</span><span class=w> </span><span class=err>$</span><span class=p>(</span><span class=vg>find</span><span class=w> </span><span class=o>/</span><span class=vg>sys</span><span class=o>/</span><span class=vg>kernel</span><span class=o>/</span><span class=vg>iommu_groups</span><span class=o>/*</span><span class=w> </span><span class=o>-</span><span class=vg>maxdepth</span><span class=w> </span><span class=il>0</span><span class=w> </span><span class=o>-</span><span class=vg>type</span><span class=w> </span><span class=vg>d</span><span class=w> </span><span class=o>|</span><span class=w> </span><span class=vg>sort</span><span class=w> </span><span class=o>-</span><span class=vg>V</span><span class=p>);</span><span class=w> </span><span class=vg>do</span>
-</span></span><span class=line><span class=cl><span class=w>    </span><span class=vg>echo</span><span class=w> </span><span class=s2>&#34;IOMMU Group ${g##*/}:&#34;</span>
-</span></span><span class=line><span class=cl><span class=w>    </span><span class=vg>for</span><span class=w> </span><span class=vg>d</span><span class=w> </span><span class=vg>in</span><span class=w> </span><span class=err>$</span><span class=vg>g</span><span class=o>/</span><span class=vg>devices</span><span class=o>/*</span><span class=p>;</span><span class=w> </span><span class=vg>do</span>
-</span></span><span class=line><span class=cl><span class=w>        </span><span class=vg>echo</span><span class=w> </span><span class=o>-</span><span class=vg>e</span><span class=w> </span><span class=s2>&#34;\t$(lspci -nns ${d##*/})&#34;</span>
-</span></span><span class=line><span class=cl><span class=w>    </span><span class=vg>done</span><span class=p>;</span>
-</span></span><span class=line><span class=cl><span class=vg>done</span><span class=p>;</span>
-</span></span></code></pre></div><p>看到类似以下信息说明 IOMMU 开启成功</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>IOMMU Group 0:
-</span></span><span class=line><span class=cl>        00:00.0 Host bridge [0600]: Intel Corporation Comet Lake-S 6c Host Bridge/DRAM Controller [8086:9b53] (rev 05)
-</span></span><span class=line><span class=cl>IOMMU Group 1:
-</span></span><span class=line><span class=cl>        00:01.0 PCI bridge [0604]: Intel Corporation 6th-10th Gen Core Processor PCIe Controller (x16) [8086:1901] (rev 05)
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl>...
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl>IOMMU Group 6:
-</span></span><span class=line><span class=cl>        00:1c.0 PCI bridge [0604]: Intel Corporation Device [8086:a394] (rev f0)
-</span></span><span class=line><span class=cl>        03:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Baffin [Radeon RX 460/560D / Pro 450/455/460/555/555X/560/560X] [1002:67ef] (rev cf)
-</span></span><span class=line><span class=cl>        03:00.1 Audio device [0403]: Advanced Micro Devices, Inc. [AMD/ATI] Baffin HDMI/DP Audio [Radeon RX 550 640SP / RX 560/560X] [1002:aae0]
-</span></span></code></pre></div><p></p><div class="tip inlineBlock warning">如果上面没有开启 <code>pcie_acs_override=downstream</code> 就只能将整个 Group 下的设备都直通给某个虚拟机</div><p></p><h3 id=隔离-gpu>隔离 GPU</h3><p>我们需要使用占位驱动程序（vfio）接管显卡，这样才能后续将显卡分配给虚拟机</p><p>在 PVE 宿主机的 /etc/modules 中添加 vfio 模块</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>vfio
-</span></span><span class=line><span class=cl>vfio_iommu_type1
-</span></span><span class=line><span class=cl>vfio_pci
-</span></span><span class=line><span class=cl>vfio_virqfd
-</span></span></code></pre></div><p>修改 /etc/modprobe.d/vfio.conf 将显卡的供应商-设备 ID 传递给 vfio 驱动，供应商-设备 ID 可以在上面脚本的输出的 <code>[]</code> 中找到，多个设备用 <code>,</code> 分隔</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>options vfio-pci ids=device_id1,device_id2 disable_vga=1
-</span></span></code></pre></div><p>以我的 RX460 为例，它的供应商-设备 ID 是 1002:67ef 和 1002:aae0</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>IOMMU Group 6:
-</span></span><span class=line><span class=cl>        00:1c.0 PCI bridge [0604]: Intel Corporation Device [8086:a394] (rev f0)
-</span></span><span class=line><span class=cl>        03:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Baffin [Radeon RX 460/560D / Pro 450/455/460/555/555X/560/560X] [1002:67ef] (rev cf)
-</span></span><span class=line><span class=cl>        03:00.1 Audio device [0403]: Advanced Micro Devices, Inc. [AMD/ATI] Baffin HDMI/DP Audio [Radeon RX 550 640SP / RX 560/560X] [1002:aae0]
-</span></span></code></pre></div><p>所以需要添加的内容是：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>options vfio-pci ids=1002:67ef,1002:aae0 disable_vga=1
-</span></span></code></pre></div><p>然后在 PVE 宿主机的 /etc/modprobe.d/blacklist.conf 中禁用其他显卡驱动，防止这些驱动在 vfio 前加载</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># NVIDIA
-</span></span><span class=line><span class=cl>blacklist nvidiafb
-</span></span><span class=line><span class=cl>blacklist nouveau
-</span></span><span class=line><span class=cl>blacklist nvidia
-</span></span><span class=line><span class=cl>blacklist snd_hda_intel
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl># Intel
-</span></span><span class=line><span class=cl>blacklist snd_hda_codec_hdmi
-</span></span><span class=line><span class=cl>blacklist i915
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl># AMD
-</span></span><span class=line><span class=cl>blacklist radeon
-</span></span></code></pre></div><p>最后应用更改并重启</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>update-initramfs -u
-</span></span></code></pre></div><h3 id=分配显卡>分配显卡</h3><p>重启后就可以将显卡分配给虚拟机了：</p><p>在设备中选择添加 PCI 设备，然后选择你要添加的显卡即可（独显核显都可以）</p><p><figure class=gallery-image style=flex-grow:238;flex-basis:572px><a href=/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial/pve-passthrough.jpeg data-size=599x251><img src=/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial/pve-passthrough.jpeg width=599 height=251 loading=lazy alt="pve 直通选项"></a><figcaption>pve 直通选项</figcaption></figure></p><p></p><div class="tip inlineBlock info">不同的显卡这里选择的选项不太一样，根据我的试验：<br>直通 UHD630 只需要勾选 <code>全功能（All Functions）</code><br>直通 AMD RX460 除了 <code>主 GPU（Primary GPU）</code> 外的选项都需要勾选</div><p></p><p>直通之后 PVE 自带的 VNC 可能会卡在白苹果界面，其实系统已经正常启动，可以使用 MacOS 自带的 VNC 进行连接</p><p><figure class=gallery-image style=flex-grow:141;flex-basis:339px><a href=/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial/stuck-apple.png data-size=670x474><img src=/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial/stuck-apple.png width=670 height=474 loading=lazy alt=白苹果></a><figcaption>白苹果</figcaption></figure></p><h2 id=远程访问>远程访问</h2><h3 id=分辨率调整>分辨率调整</h3><p>当你通过 PVE 自带的 VNC 连接黑苹果的时候会发现有一个分辨率为 1080p 的内置显示器，并且没有其他分辨率的选项，所以需要一些奇技淫巧来强制修改分辨率：</p><p>这里用到两个软件：BetterDummy 和 SwitchResX</p><p>首先使用 BetterDummy 创建一个和你物理显示器比例一致的虚拟显示器并设为主显示器</p><p><figure class=gallery-image style=flex-grow:114;flex-basis:275px><a href=/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial/create-new-dummy.jpeg data-size=525x458><img src=/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial/create-new-dummy.jpeg width=525 height=458 loading=lazy alt=创建虚拟显示器></a><figcaption>创建虚拟显示器</figcaption></figure></p><p>然后使用 SwitchResX 修改虚拟显示器分辨率为你物理显示器的原生分辨率</p><p><figure class=gallery-image style=flex-grow:209;flex-basis:502px><a href=/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial/switch-res.jpeg data-size=538x257><img src=/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial/switch-res.jpeg width=538 height=257 loading=lazy alt=修改分辨率></a><figcaption>修改分辨率</figcaption></figure></p><p></p><div class="tip inlineBlock info">不推荐使用带有 HiDPI 的分辨率，因为 HiDPI 是一种超采样技术（HiDPI 原理可以参考<a class=link href=https://blog.skk.moe/post/hidpi-what-why-how/ target=_blank rel=noopener>这篇文章</a>）靠渲染更多的像素来使图像“看起来”更清晰。但是大部分远程桌面软件都会将原生分辨率压缩为当前物理屏幕分辨率进行传输，所以开启 HiDPI 除了会浪费计算资源、增加延迟外没有任何意义</div><p></p><p>（可选）使用 SwitchResX 关闭默认显示器<br>这个步骤不是必须的，如果你的远程桌面软件无法选择用于串流的显示器（比如 VNC Viewer）可以关闭默认显示器来强制软件使用虚拟显示器</p><p><figure class=gallery-image style=flex-grow:174;flex-basis:418px><a href=/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial/disable-default-display.jpeg data-size=469x269><img src=/p/pve-virtualized-hackintosh-gpu-passthrough-and-remote-access-tutorial/disable-default-display.jpeg width=469 height=269 loading=lazy alt=关闭默认显示器></a><figcaption>关闭默认显示器</figcaption></figure></p><h3 id=原生方案>原生方案</h3><p>MacOS 原生提供 VNC 和 ARD 两种协议进行远程访问，可以在 <code>设置->分享</code> 中开启</p><h4 id=vnc>VNC</h4><p>自带的 VNC 是阉割版的，体验上做的很差：不支持调整画质、分辨率，不支持选择显示器（多显示器会横向拼接显示内容）从 Windows 访问键位映射有问题并且无法修改，卡顿严重，拖动窗口的时候尤其明显。唯一的优点是画质非常好，是本文介绍的所有方案中唯一一个使用原生分辨率传输（开启 HiDPI 画质明显提升）</p><h4 id=ard>ARD</h4><p>ARD 属于是 VNC 套壳，可以使用 Apple 官方的 <a class=link href="https://apps.apple.com/us/app/apple-remote-desktop/id409907375?mt=12" target=_blank rel=noopener>Apple Remote Desktop</a> 软件（售价高达 518，不会真有冤大头会买吧。。。）连接黑苹果主机。相比于 VNC，ARD 支持选择显示器，提供 4 挡可调的图像质量，在保证画质的前提下提供不错的延迟表现。并且除了远程桌面以外还提供命令执行、系统报告、文件传输等系统管理功能，缺点是只支持 MacOS（Windows 下可以使用支持 VNC 协议的软件连接，但是会退化成和原生 VNC 一样的垃圾体验）</p><h4 id=自建-vnc-server>自建 VNC Server</h4><p>既然自带的 VNC 如此不堪使用，ARD 又不提供 Windows 客户端，我们只能求助于第三方软件来提供满血版 VNC 协议支持。这里推荐 <a class=link href=https://www.realvnc.com/en/connect/download/vnc/macos/ target=_blank rel=noopener>Real VNC</a>，可以兼具 VNC 高画质和 ARD 的低延迟，除了不支持 HiDPI 外基本上能提供和连接显示器一致的体验</p><h3 id=第三方软件私有协议>第三方软件/私有协议</h3><h4 id=todesk>ToDesk</h4><p>ToDesk 在我的体验中卡顿非常严重。除了提供免费的内网穿透以外，相比其他方案基本上毫无优势可言，如果你有公网 IP 的话不要选择它。所以名气大的（尤其是国产软件）不一定真的好用。。。</p><h4 id=parsec>ParSec</h4><p>ParSec 的原本用途是游戏串流，提供精细的配置项可供选择，细节上体验很舒适。相比于其他方案它的延迟和画面质量很稳定，不会在画面快速变化时卡顿或者糊掉，并且支持播放被控主机声音。可能是现在 Mac 版还处于 Beta 阶段的原因，ParSec 对性能要求很高，RX460 在 2560×1440 分辨率下延迟 20ms 左右，3440×1440（2k 带鱼屏）分辨率下延迟 40ms 左右</p><h4 id=jump-desktop>Jump Desktop</h4><p>Jump Desktop 是老牌 mac 远程桌面应用，使用私有的 Fluid 协议。延迟低、带宽占用低，但是画面也是最糊的，特别是窗口拖动等画面快速变化的场景涂抹感非常严重。Jump Desktop 支持自定义任何按键或是组合键的映射，和 ParSec 一样也支持播放被控主机声音</p><h2 id=总结与性能测试>总结与性能测试</h2><p>测试环境：</p><p>GPU： 直通 RX460 GeekBench 5 Metal 分 21000 左右，性能大致相当于 M1 核显<br>网络：内网（网络延迟 &lt;1ms）<br>分辨率：3440x1440（非 HiDPI）<br>软件版本：各软件均使用当前最新免费/试用版，画质选择最高一档</p><table><thead><tr><th>软件/协议</th><th>延迟</th><th>画质</th><th>按键映射</th><th>多显示器</th><th>声音</th><th>文件传输</th><th>连接方式</th></tr></thead><tbody><tr><td>原生 VNC</td><td>高</td><td>最好（支持 HiDPI）</td><td>不支持修改</td><td>拼接所有显示器</td><td>不支持</td><td>不支持</td><td>直连</td></tr><tr><td>RealVNC</td><td>低（2ms）</td><td>最好</td><td>自定义任何按键映射</td><td>服务端配置</td><td>不支持</td><td>支持</td><td>直连</td></tr><tr><td>ARD</td><td>中等</td><td>一般（滚动时画面会糊）</td><td>不支持修改</td><td>客户端选择</td><td>不支持</td><td>支持</td><td>直连</td></tr><tr><td>ToDesk</td><td>高</td><td>一般（有明显涂抹感）</td><td>自定义功能键映射</td><td>客户端选择</td><td>不支持</td><td>支持</td><td>免费内网穿透</td></tr><tr><td>ParSec</td><td>中等（40ms）</td><td>较好（有轻微涂抹感）</td><td>不支持修改</td><td>客户端选择</td><td>支持</td><td>不支持</td><td>直连（自动 UPNP）</td></tr><tr><td>Jump Desktop</td><td>低（10ms）</td><td>差（画面最糊）</td><td>自定义任何按键映射</td><td>客户端选择</td><td>支持</td><td>不支持</td><td>直连（自动 UPNP）</td></tr></tbody></table><p></p><div class="tip inlineBlock info">除 ToDesk 外的方案若想要通过公网访问均需要被控端具备公网 IP 并配置端口映射或自行搭建内网穿透<br>ParSec 和 Jump Desktop 会通过 UPNP 帮你自动映射端口，并且登陆它们的账号可以直接看到你的被控端主机，不用通过 IP 手动添加主机，尤其适用于你的公网 IP 是动态 IP 的情况</div><p></p></section><footer class=article-footer><section class=article-tags><a href=/tags/pve>PVE</a>
-<a href=/tags/macos>MacOS</a>
-<a href=/tags/hackintosh>Hackintosh</a>
-<a href=/tags/%E9%BB%91%E8%8B%B9%E6%9E%9C>黑苹果</a></section><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg><span>Licensed under <a class=link href=https://creativecommons.org/licenses/by-nc-sa/4.0 target=_blank rel=noopener>CC BY-NC-SA 4.0</a></br>转载或引用本文时请遵守许可协议，知会作者并注明出处</br>不得用于商业用途！</span></section><section class=article-lastmod><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg><span>Last updated on Nov 19, 2022 13:47</span></section></footer></article><aside class=related-contents--wrapper><h2 class=section-title>Related contents</h2><div class=related-contents><div class="flex article-list--tile"><article class=has-image><a href=/p/use-dns-to-create-split-routing-for-different-domain-or-ip-ranges><div class=article-image><img src=/p/use-dns-to-create-split-routing-for-different-domain-or-ip-ranges/dns.35e2285a25bd29bfb5085f30697638a7_hu68696ece74dcc060ca3f65dbe2b1cee1_41184_250x150_fill_box_smart1_3.png width=250 height=150 loading=lazy data-key=use-dns-to-create-split-routing-for-different-domain-or-ip-ranges data-hash="md5-NeIoWiW9Kb+1CF8waXY4pw=="></div><div class=article-details><h2 class=article-title>巧用 DNS 实现国内外域名 ip 分流上网</h2></div></a></article><article class=has-image><a href=/p/website-hosting-and-function-computing-service-selection><div class=article-image><img src=/p/website-hosting-and-function-computing-service-selection/cover.svg loading=lazy data-key=website-hosting-and-function-computing-service-selection data-hash=/p/website-hosting-and-function-computing-service-selection/cover.svg></div><div class=article-details><h2 class=article-title>Cloudflare or Vercel —— 网站托管与函数计算服务选择</h2></div></a></article><article class=has-image><a href=/p/selection-and-migration-from-typecho-to-hugo><div class=article-image><img src=/img/71360830_p0.409931285b4d88ac5bc04313c8711b27_hu465e5a0e70aa4f411dc46346df3ca0ca_139182_250x150_fill_q75_box_smart1.jpg width=250 height=150 loading=lazy data-key=selection-and-migration-from-typecho-to-hugo data-hash="md5-QJkxKFtNiKxbwEMTyHEbJw=="></div><div class=article-details><h2 class=article-title>从 Typecho 到 Hugo 的选择与迁移</h2></div></a></article><article class=has-image><a href=/p/nginx-ssl-tls-configuration-optimization><div class=article-image><img src=/p/nginx-ssl-tls-configuration-optimization/ssl-logo.dcc1d89a79f4e18c05f875ef1d4c47e7_hu0d352a211a34cc70a94a1106767ca9fd_19549_250x150_fill_q75_box_smart1.jpg width=250 height=150 loading=lazy data-key=nginx-ssl-tls-configuration-optimization data-hash="md5-3MHYmnn04YwF+HXvHUxH5w=="></div><div class=article-details><h2 class=article-title>Nginx SSL/TLS 配置优化</h2></div></a></article><article class=has-image><a href=/p/deluge-modify-user-agent-and-peer-id-tutorials><div class=article-image><img src=/p/deluge-modify-user-agent-and-peer-id-tutorials/deluge-logo.da65f5c515641d892af10ab163731505_hud927fadcfecc8c2fd76c8e1fda8fa111_26133_250x150_fill_q75_box_smart1.jpg width=250 height=150 loading=lazy data-key=deluge-modify-user-agent-and-peer-id-tutorials data-hash="md5-2mX1xRVkHYkq8QqxY3MVBQ=="></div><div class=article-details><h2 class=article-title>Deluge 2.0.3 修改 user-agent 和 peer-id 教程</h2></div></a></article></div></div></aside><script async defer src=//cdn.jsdelivr.net/npm/@waline/client/dist/Waline.min.js></script><div id=waline class=waline-container></div><style>.waline-container{background-color:var(--card-background);border-radius:var(--card-border-radius);box-shadow:var(--shadow-l1);padding:var(--card-padding)}.waline-container .vcount{color:var(--card-text-color-main)}:root{--waline-theme-color:#0e6db1;--waline-active-color:#107fcf}</style><script>addLoadEvent(function(){new Waline({el:"#waline",dark:'html[data-scheme="dark"]',serverURL:"https://comment.lv5.moe",visitor:!0,copyright:!1,avatar:"retro",emoji:["https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/qq","https://cdn.jsdelivr.net/gh/walinejs/emojis@1.0.0/tw-emoji"],requiredMeta:["nick","mail"]})})</script><footer class=site-footer><section class=copyright>&copy;
-2020 -
-2023 SSpiritsの秘密基地</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/ShadowySpirits/hugo-theme-stack target=_blank rel=noopener data-version=3.5.0>Stack</a></b> modified by <a href=https://blog.lv5.moe target=_blank rel=noopener>SSpirits</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-<button class="pswp__button pswp__button--share" title=Share></button>
-<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
-<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css integrity="sha256-c0uckgykQ9v5k+IqViZOZKc47Jn7KQil4/MP3ySA3F8=" crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE=" crossorigin=anonymous></main><aside class="sidebar right-sidebar sticky"><div id=article-toolbar><a href=https://blog.lv5.moe class=back-home><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg><span>Home</span></a>
-<a href=/about class=back-home><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg><span>About</span></a></div><form action=/search class="search-form widget"><p><label>Search</label>
-<input name=keyword required placeholder="Type something...">
-<button title=Search><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg></button></p></form><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#适用场景>适用场景</a></li><li><a href=#主要配置>主要配置</a><ol><li><a href=#硬件配置>硬件配置</a></li><li><a href=#软件版本>软件版本</a></li></ol></li><li><a href=#显卡直通>显卡直通</a><ol><li><a href=#启用-iommu>启用 IOMMU</a></li><li><a href=#隔离-gpu>隔离 GPU</a></li><li><a href=#分配显卡>分配显卡</a></li></ol></li><li><a href=#远程访问>远程访问</a><ol><li><a href=#分辨率调整>分辨率调整</a></li><li><a href=#原生方案>原生方案</a><ol><li><a href=#vnc>VNC</a></li><li><a href=#ard>ARD</a></li><li><a href=#自建-vnc-server>自建 VNC Server</a></li></ol></li><li><a href=#第三方软件私有协议>第三方软件/私有协议</a><ol><li><a href=#todesk>ToDesk</a></li><li><a href=#parsec>ParSec</a></li><li><a href=#jump-desktop>Jump Desktop</a></li></ol></li></ol></li><li><a href=#总结与性能测试>总结与性能测试</a></li></ol></nav></div></section><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M9.828 9.172a4 4 0 100 5.656A10 10 0 0012 12a10 10 0 012.172-2.828 4 4 0 110 5.656A10 10 0 0112 12 10 10 0 009.828 9.172"/></svg></div><h2 class="widget-title section-title">Archives</h2><div class=widget-archive--list><div class=archives-year><a href=/archives#2023><span class=year>2023</span>
-<span class=count>2</span></a></div><div class=archives-year><a href=/archives#2022><span class=year>2022</span>
-<span class=count>8</span></a></div><div class=archives-year><a href=/archives#2021><span class=year>2021</span>
-<span class=count>5</span></a></div><div class=archives-year><a href=/archives#2019><span class=year>2019</span>
-<span class=count>17</span></a></div><div class=archives-year><a href=/archives#2018><span class=year>2018</span>
-<span class=count>6</span></a></div></div></section><section class="widget tagCloud"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11 3l9 9a1.5 1.5.0 010 2l-6 6a1.5 1.5.0 01-2 0L3 11V7a4 4 0 014-4h4"/><circle cx="9" cy="9" r="2"/></svg></div><h2 class="widget-title section-title">Tags</h2><div class=tagCloud-tags><a href=/tags/linux class=font_size_4>Linux</a>
-<a href=/tags/rocketmq class=font_size_4>RocketMQ</a>
-<a href=/tags/typecho class=font_size_4>Typecho</a>
-<a href=/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6 class=font_size_4>中间件</a>
-<a href=/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97 class=font_size_4>消息队列</a>
-<a href=/tags/cdn class=font_size_3>CDN</a>
-<a href=/tags/java class=font_size_3>Java</a>
-<a href=/tags/kotlin class=font_size_3>Kotlin</a>
-<a href=/tags/operating-system class=font_size_3>Operating System</a>
-<a href=/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7 class=font_size_3>可观测性</a>
-<a href=/tags/android class=font_size_2>Android</a>
-<a href=/tags/bt/pt class=font_size_2>BT/PT</a>
-<a href=/tags/cloudflare class=font_size_2>Cloudflare</a>
-<a href=/tags/db class=font_size_2>DB</a>
-<a href=/tags/kubernetes class=font_size_2>Kubernetes</a>
-<a href=/tags/laravel class=font_size_2>Laravel</a>
-<a href=/tags/math class=font_size_2>Math</a>
-<a href=/tags/nginx class=font_size_2>Nginx</a>
-<a href=/tags/php class=font_size_2>PHP</a>
-<a href=/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86 class=font_size_2>内存管理</a>
-<a href=/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90 class=font_size_2>源码分析</a>
-<a href=/tags/alibaba-cloud class=font_size_1>Alibaba Cloud</a>
-<a href=/tags/clash class=font_size_1>Clash</a>
-<a href=/tags/codec class=font_size_1>Codec</a>
-<a href=/tags/concurrent class=font_size_1>Concurrent</a>
-<a href=/tags/crack class=font_size_1>Crack</a>
-<a href=/tags/dns class=font_size_1>DNS</a>
-<a href=/tags/file-system class=font_size_1>File System</a>
-<a href=/tags/font class=font_size_1>font</a>
-<a href=/tags/hackintosh class=font_size_1>Hackintosh</a>
-<a href=/tags/homelab class=font_size_1>HomeLab</a>
-<a href=/tags/hugo class=font_size_1>Hugo</a>
-<a href=/tags/iptables class=font_size_1>iptables</a>
-<a href=/tags/jvm class=font_size_1>JVM</a>
-<a href=/tags/k3s class=font_size_1>K3s</a>
-<a href=/tags/kms class=font_size_1>KMS</a>
-<a href=/tags/macos class=font_size_1>MacOS</a>
-<a href=/tags/media class=font_size_1>Media</a>
-<a href=/tags/metrics class=font_size_1>Metrics</a>
-<a href=/tags/mosdns class=font_size_1>MosDNS</a>
-<a href=/tags/mysql class=font_size_1>Mysql</a>
-<a href=/tags/nas class=font_size_1>NAS</a>
-<a href=/tags/nextcloud class=font_size_1>Nextcloud</a>
-<a href=/tags/oss class=font_size_1>OSS</a>
-<a href=/tags/pbr class=font_size_1>PBR</a>
-<a href=/tags/pve class=font_size_1>PVE</a>
-<a href=/tags/rancher class=font_size_1>Rancher</a>
-<a href=/tags/serverless class=font_size_1>Serverless</a>
-<a href=/tags/spring class=font_size_1>Spring</a>
-<a href=/tags/ssl class=font_size_1>SSL</a>
-<a href=/tags/traefik class=font_size_1>Traefik</a>
-<a href=/tags/vercel class=font_size_1>Vercel</a>
-<a href=/tags/%E5%8D%9A%E5%AE%A2%E8%BF%81%E7%A7%BB class=font_size_1>博客迁移</a>
-<a href=/tags/%E5%8F%88%E6%8B%8D%E4%BA%91 class=font_size_1>又拍云</a>
-<a href=/tags/%E5%9D%97%E5%AD%98%E5%82%A8 class=font_size_1>块存储</a>
-<a href=/tags/%E5%AD%98%E5%82%A8 class=font_size_1>存储</a>
-<a href=/tags/%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8 class=font_size_1>对象存储</a>
-<a href=/tags/%E7%AD%96%E7%95%A5%E8%B7%AF%E7%94%B1 class=font_size_1>策略路由</a>
-<a href=/tags/%E9%98%BF%E9%87%8C%E4%BA%91 class=font_size_1>阿里云</a>
-<a href=/tags/%E9%BB%91%E8%8B%B9%E6%9E%9C class=font_size_1>黑苹果</a></div></section></aside></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g=" crossorigin=anonymous defer></script><script type=text/javascript src=/ts/main.js defer></script>
-<script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script><script type=text/javascript>console.log("%c SSpiritsの秘密基地 %c わたし、気になります！ ","color: #fff; margin: 1em 0; padding: 5px 0; background: #3498db;","margin: 1em 0; padding: 5px 0; background: #efefef;")</script></body><script>if(!window.location.pathname.startsWith("/p/"))for(var x=document.getElementById("visitor-count");x!=null;)x.remove(),x=document.getElementById("visitor-count")</script></html>
+<!DOCTYPE html>
+
+<html class="no-js" lang="zh">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="国光的 PVE 环境搭建教程" name="description"/>
+<meta content="国光" name="author"/>
+<link href="https://pve.sqlsec.com/" rel="canonical"/>
+<link href="https://image.3001.net/images/20200922/16007336487809.jpg" rel="icon"/>
+<meta content="mkdocs-1.4.2, mkdocs-material-8.5.1" name="generator"/>
+<title>主页 - 国光的 PVE 环境搭建教程</title>
+<link href="assets/stylesheets/main.2e8b5541.min.css" rel="stylesheet"/>
+<link href="assets/stylesheets/palette.cbb835fc.min.css" rel="stylesheet"/>
+<script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+<link href="overrides/assets/stylesheets/main.8a4f01ed.min.css" rel="stylesheet"/>
+<link href="assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+            
+                .gscrollbar-fixer { padding-right: 15px; }
+                .gdesc-inner { font-size: 0.75rem; }
+                body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+                body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+                body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}
+                </style><script src="assets/javascripts/glightbox.min.js"></script></head>
+<body data-md-color-accent="indigo" data-md-color-primary="indigo" data-md-color-scheme="default" dir="ltr">
+<script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header md-header--lifted" data-md-component="header">
+<nav aria-label="页眉" class="md-header__inner md-grid">
+<a aria-label="国光的 PVE 环境搭建教程" class="md-header__button md-logo" data-md-component="logo" href="." title="国光的 PVE 环境搭建教程">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M220.8 123.3c1 .5 1.8 1.7 3 1.7 1.1 0 2.8-.4 2.9-1.5.2-1.4-1.9-2.3-3.2-2.9-1.7-.7-3.9-1-5.5-.1-.4.2-.8.7-.6 1.1.3 1.3 2.3 1.1 3.4 1.7zm-21.9 1.7c1.2 0 2-1.2 3-1.7 1.1-.6 3.1-.4 3.5-1.6.2-.4-.2-.9-.6-1.1-1.6-.9-3.8-.6-5.5.1-1.3.6-3.4 1.5-3.2 2.9.1 1 1.8 1.5 2.8 1.4zM420 403.8c-3.6-4-5.3-11.6-7.2-19.7-1.8-8.1-3.9-16.8-10.5-22.4-1.3-1.1-2.6-2.1-4-2.9-1.3-.8-2.7-1.5-4.1-2 9.2-27.3 5.6-54.5-3.7-79.1-11.4-30.1-31.3-56.4-46.5-74.4-17.1-21.5-33.7-41.9-33.4-72C311.1 85.4 315.7.1 234.8 0 132.4-.2 158 103.4 156.9 135.2c-1.7 23.4-6.4 41.8-22.5 64.7-18.9 22.5-45.5 58.8-58.1 96.7-6 17.9-8.8 36.1-6.2 53.3-6.5 5.8-11.4 14.7-16.6 20.2-4.2 4.3-10.3 5.9-17 8.3s-14 6-18.5 14.5c-2.1 3.9-2.8 8.1-2.8 12.4 0 3.9.6 7.9 1.2 11.8 1.2 8.1 2.5 15.7.8 20.8-5.2 14.4-5.9 24.4-2.2 31.7 3.8 7.3 11.4 10.5 20.1 12.3 17.3 3.6 40.8 2.7 59.3 12.5 19.8 10.4 39.9 14.1 55.9 10.4 11.6-2.6 21.1-9.6 25.9-20.2 12.5-.1 26.3-5.4 48.3-6.6 14.9-1.2 33.6 5.3 55.1 4.1.6 2.3 1.4 4.6 2.5 6.7v.1c8.3 16.7 23.8 24.3 40.3 23 16.6-1.3 34.1-11 48.3-27.9 13.6-16.4 36-23.2 50.9-32.2 7.4-4.5 13.4-10.1 13.9-18.3.4-8.2-4.4-17.3-15.5-29.7zM223.7 87.3c9.8-22.2 34.2-21.8 44-.4 6.5 14.2 3.6 30.9-4.3 40.4-1.6-.8-5.9-2.6-12.6-4.9 1.1-1.2 3.1-2.7 3.9-4.6 4.8-11.8-.2-27-9.1-27.3-7.3-.5-13.9 10.8-11.8 23-4.1-2-9.4-3.5-13-4.4-1-6.9-.3-14.6 2.9-21.8zM183 75.8c10.1 0 20.8 14.2 19.1 33.5-3.5 1-7.1 2.5-10.2 4.6 1.2-8.9-3.3-20.1-9.6-19.6-8.4.7-9.8 21.2-1.8 28.1 1 .8 1.9-.2-5.9 5.5-15.6-14.6-10.5-52.1 8.4-52.1zm-13.6 60.7c6.2-4.6 13.6-10 14.1-10.5 4.7-4.4 13.5-14.2 27.9-14.2 7.1 0 15.6 2.3 25.9 8.9 6.3 4.1 11.3 4.4 22.6 9.3 8.4 3.5 13.7 9.7 10.5 18.2-2.6 7.1-11 14.4-22.7 18.1-11.1 3.6-19.8 16-38.2 14.9-3.9-.2-7-1-9.6-2.1-8-3.5-12.2-10.4-20-15-8.6-4.8-13.2-10.4-14.7-15.3-1.4-4.9 0-9 4.2-12.3zm3.3 334c-2.7 35.1-43.9 34.4-75.3 18-29.9-15.8-68.6-6.5-76.5-21.9-2.4-4.7-2.4-12.7 2.6-26.4v-.2c2.4-7.6.6-16-.6-23.9-1.2-7.8-1.8-15 .9-20 3.5-6.7 8.5-9.1 14.8-11.3 10.3-3.7 11.8-3.4 19.6-9.9 5.5-5.7 9.5-12.9 14.3-18 5.1-5.5 10-8.1 17.7-6.9 8.1 1.2 15.1 6.8 21.9 16l19.6 35.6c9.5 19.9 43.1 48.4 41 68.9zm-1.4-25.9c-4.1-6.6-9.6-13.6-14.4-19.6 7.1 0 14.2-2.2 16.7-8.9 2.3-6.2 0-14.9-7.4-24.9-13.5-18.2-38.3-32.5-38.3-32.5-13.5-8.4-21.1-18.7-24.6-29.9s-3-23.3-.3-35.2c5.2-22.9 18.6-45.2 27.2-59.2 2.3-1.7.8 3.2-8.7 20.8-8.5 16.1-24.4 53.3-2.6 82.4.6-20.7 5.5-41.8 13.8-61.5 12-27.4 37.3-74.9 39.3-112.7 1.1.8 4.6 3.2 6.2 4.1 4.6 2.7 8.1 6.7 12.6 10.3 12.4 10 28.5 9.2 42.4 1.2 6.2-3.5 11.2-7.5 15.9-9 9.9-3.1 17.8-8.6 22.3-15 7.7 30.4 25.7 74.3 37.2 95.7 6.1 11.4 18.3 35.5 23.6 64.6 3.3-.1 7 .4 10.9 1.4 13.8-35.7-11.7-74.2-23.3-84.9-4.7-4.6-4.9-6.6-2.6-6.5 12.6 11.2 29.2 33.7 35.2 59 2.8 11.6 3.3 23.7.4 35.7 16.4 6.8 35.9 17.9 30.7 34.8-2.2-.1-3.2 0-4.2 0 3.2-10.1-3.9-17.6-22.8-26.1-19.6-8.6-36-8.6-38.3 12.5-12.1 4.2-18.3 14.7-21.4 27.3-2.8 11.2-3.6 24.7-4.4 39.9-.5 7.7-3.6 18-6.8 29-32.1 22.9-76.7 32.9-114.3 7.2zm257.4-11.5c-.9 16.8-41.2 19.9-63.2 46.5-13.2 15.7-29.4 24.4-43.6 25.5s-26.5-4.8-33.7-19.3c-4.7-11.1-2.4-23.1 1.1-36.3 3.7-14.2 9.2-28.8 9.9-40.6.8-15.2 1.7-28.5 4.2-38.7 2.6-10.3 6.6-17.2 13.7-21.1.3-.2.7-.3 1-.5.8 13.2 7.3 26.6 18.8 29.5 12.6 3.3 30.7-7.5 38.4-16.3 9-.3 15.7-.9 22.6 5.1 9.9 8.5 7.1 30.3 17.1 41.6 10.6 11.6 14 19.5 13.7 24.6zM173.3 148.7c2 1.9 4.7 4.5 8 7.1 6.6 5.2 15.8 10.6 27.3 10.6 11.6 0 22.5-5.9 31.8-10.8 4.9-2.6 10.9-7 14.8-10.4s5.9-6.3 3.1-6.6-2.6 2.6-6 5.1c-4.4 3.2-9.7 7.4-13.9 9.8-7.4 4.2-19.5 10.2-29.9 10.2s-18.7-4.8-24.9-9.7c-3.1-2.5-5.7-5-7.7-6.9-1.5-1.4-1.9-4.6-4.3-4.9-1.4-.1-1.8 3.7 1.7 6.5z"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            国光的 PVE 环境搭建教程
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              主页
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="切换深色模式" class="md-option" data-md-color-accent="indigo" data-md-color-media="" data-md-color-primary="indigo" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="切换深色模式">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+</label>
+<input aria-label="切换浅色模式" class="md-option" data-md-color-accent="blue" data-md-color-media="" data-md-color-primary="black" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="切换浅色模式">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"></path></svg>
+</label>
+</form>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="搜索" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="搜索" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"></path></svg>
+</label>
+<nav aria-label="查找" class="md-search__options">
+<a aria-label="分享" class="md-search__icon md-icon" data-clipboard="" data-clipboard-text="" data-md-component="search-share" href="javascript:void(0)" tabindex="-1" title="分享">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"></path></svg>
+</a>
+<button aria-label="清空当前内容" class="md-search__icon md-icon" tabindex="-1" title="清空当前内容" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+<ol class="md-search-result__list"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="md-header__source">
+<a class="md-source" data-md-component="source" href="https://github.com/sqlsec/PVE" title="前往仓库">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
+</div>
+<div class="md-source__repository">
+    sqlsec/PVE
+  </div>
+</a>
+</div>
+</nav>
+<nav aria-label="标签" class="md-tabs" data-md-component="tabs">
+<div class="md-tabs__inner md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link md-tabs__link--active" href=".">
+      主页
+    </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="1/1/">
+        准备工作
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="2/1/">
+        PVE 基础
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="3/1/">
+        网络划分
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="4/1/">
+        PEV 进阶
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="5/1/">
+        软路由
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="6/1/">
+        黑群晖
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="7/1/">
+        黑苹果
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="8/1/">
+        远程穿透
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="9/1/">
+        IPv6 专题
+      </a>
+</li>
+</ul>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<style>.md-header{position:initial}.md-main__inner{margin:0}.md-content{display:none}@media screen and (min-width:60em){.md-sidebar--secondary{display:none}}@media screen and (min-width:76.25em){.md-sidebar--primary{display:none}}</style>
+<section class="mdx-container">
+<div class="md-grid md-typeset">
+<div class="mdx-hero">
+<div class="mdx-hero__image">
+<img alt="" draggable="false" height="1200" src="https://image.3001.net/images/20221208/16704316816850.png" width="1659"/>
+</div>
+<div class="mdx-hero__content">
+<h1>Proxmox Virtual Environment</h1>
+<p>国光的 PVE 生产环境搭建折腾记录，涉及到硬件选购、显卡直通、软路由以及常见的 Linux 发行版的琐碎细节</p>
+<a class="md-button" href="/1/1/" title="Material for MkDocs Insiders">
+            快速开始
+          </a>
+</div>
+</div>
+</div>
+</section>
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="导航栏" class="md-nav md-nav--primary md-nav--lifted" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="国光的 PVE 环境搭建教程" class="md-nav__button md-logo" data-md-component="logo" href="." title="国光的 PVE 环境搭建教程">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M220.8 123.3c1 .5 1.8 1.7 3 1.7 1.1 0 2.8-.4 2.9-1.5.2-1.4-1.9-2.3-3.2-2.9-1.7-.7-3.9-1-5.5-.1-.4.2-.8.7-.6 1.1.3 1.3 2.3 1.1 3.4 1.7zm-21.9 1.7c1.2 0 2-1.2 3-1.7 1.1-.6 3.1-.4 3.5-1.6.2-.4-.2-.9-.6-1.1-1.6-.9-3.8-.6-5.5.1-1.3.6-3.4 1.5-3.2 2.9.1 1 1.8 1.5 2.8 1.4zM420 403.8c-3.6-4-5.3-11.6-7.2-19.7-1.8-8.1-3.9-16.8-10.5-22.4-1.3-1.1-2.6-2.1-4-2.9-1.3-.8-2.7-1.5-4.1-2 9.2-27.3 5.6-54.5-3.7-79.1-11.4-30.1-31.3-56.4-46.5-74.4-17.1-21.5-33.7-41.9-33.4-72C311.1 85.4 315.7.1 234.8 0 132.4-.2 158 103.4 156.9 135.2c-1.7 23.4-6.4 41.8-22.5 64.7-18.9 22.5-45.5 58.8-58.1 96.7-6 17.9-8.8 36.1-6.2 53.3-6.5 5.8-11.4 14.7-16.6 20.2-4.2 4.3-10.3 5.9-17 8.3s-14 6-18.5 14.5c-2.1 3.9-2.8 8.1-2.8 12.4 0 3.9.6 7.9 1.2 11.8 1.2 8.1 2.5 15.7.8 20.8-5.2 14.4-5.9 24.4-2.2 31.7 3.8 7.3 11.4 10.5 20.1 12.3 17.3 3.6 40.8 2.7 59.3 12.5 19.8 10.4 39.9 14.1 55.9 10.4 11.6-2.6 21.1-9.6 25.9-20.2 12.5-.1 26.3-5.4 48.3-6.6 14.9-1.2 33.6 5.3 55.1 4.1.6 2.3 1.4 4.6 2.5 6.7v.1c8.3 16.7 23.8 24.3 40.3 23 16.6-1.3 34.1-11 48.3-27.9 13.6-16.4 36-23.2 50.9-32.2 7.4-4.5 13.4-10.1 13.9-18.3.4-8.2-4.4-17.3-15.5-29.7zM223.7 87.3c9.8-22.2 34.2-21.8 44-.4 6.5 14.2 3.6 30.9-4.3 40.4-1.6-.8-5.9-2.6-12.6-4.9 1.1-1.2 3.1-2.7 3.9-4.6 4.8-11.8-.2-27-9.1-27.3-7.3-.5-13.9 10.8-11.8 23-4.1-2-9.4-3.5-13-4.4-1-6.9-.3-14.6 2.9-21.8zM183 75.8c10.1 0 20.8 14.2 19.1 33.5-3.5 1-7.1 2.5-10.2 4.6 1.2-8.9-3.3-20.1-9.6-19.6-8.4.7-9.8 21.2-1.8 28.1 1 .8 1.9-.2-5.9 5.5-15.6-14.6-10.5-52.1 8.4-52.1zm-13.6 60.7c6.2-4.6 13.6-10 14.1-10.5 4.7-4.4 13.5-14.2 27.9-14.2 7.1 0 15.6 2.3 25.9 8.9 6.3 4.1 11.3 4.4 22.6 9.3 8.4 3.5 13.7 9.7 10.5 18.2-2.6 7.1-11 14.4-22.7 18.1-11.1 3.6-19.8 16-38.2 14.9-3.9-.2-7-1-9.6-2.1-8-3.5-12.2-10.4-20-15-8.6-4.8-13.2-10.4-14.7-15.3-1.4-4.9 0-9 4.2-12.3zm3.3 334c-2.7 35.1-43.9 34.4-75.3 18-29.9-15.8-68.6-6.5-76.5-21.9-2.4-4.7-2.4-12.7 2.6-26.4v-.2c2.4-7.6.6-16-.6-23.9-1.2-7.8-1.8-15 .9-20 3.5-6.7 8.5-9.1 14.8-11.3 10.3-3.7 11.8-3.4 19.6-9.9 5.5-5.7 9.5-12.9 14.3-18 5.1-5.5 10-8.1 17.7-6.9 8.1 1.2 15.1 6.8 21.9 16l19.6 35.6c9.5 19.9 43.1 48.4 41 68.9zm-1.4-25.9c-4.1-6.6-9.6-13.6-14.4-19.6 7.1 0 14.2-2.2 16.7-8.9 2.3-6.2 0-14.9-7.4-24.9-13.5-18.2-38.3-32.5-38.3-32.5-13.5-8.4-21.1-18.7-24.6-29.9s-3-23.3-.3-35.2c5.2-22.9 18.6-45.2 27.2-59.2 2.3-1.7.8 3.2-8.7 20.8-8.5 16.1-24.4 53.3-2.6 82.4.6-20.7 5.5-41.8 13.8-61.5 12-27.4 37.3-74.9 39.3-112.7 1.1.8 4.6 3.2 6.2 4.1 4.6 2.7 8.1 6.7 12.6 10.3 12.4 10 28.5 9.2 42.4 1.2 6.2-3.5 11.2-7.5 15.9-9 9.9-3.1 17.8-8.6 22.3-15 7.7 30.4 25.7 74.3 37.2 95.7 6.1 11.4 18.3 35.5 23.6 64.6 3.3-.1 7 .4 10.9 1.4 13.8-35.7-11.7-74.2-23.3-84.9-4.7-4.6-4.9-6.6-2.6-6.5 12.6 11.2 29.2 33.7 35.2 59 2.8 11.6 3.3 23.7.4 35.7 16.4 6.8 35.9 17.9 30.7 34.8-2.2-.1-3.2 0-4.2 0 3.2-10.1-3.9-17.6-22.8-26.1-19.6-8.6-36-8.6-38.3 12.5-12.1 4.2-18.3 14.7-21.4 27.3-2.8 11.2-3.6 24.7-4.4 39.9-.5 7.7-3.6 18-6.8 29-32.1 22.9-76.7 32.9-114.3 7.2zm257.4-11.5c-.9 16.8-41.2 19.9-63.2 46.5-13.2 15.7-29.4 24.4-43.6 25.5s-26.5-4.8-33.7-19.3c-4.7-11.1-2.4-23.1 1.1-36.3 3.7-14.2 9.2-28.8 9.9-40.6.8-15.2 1.7-28.5 4.2-38.7 2.6-10.3 6.6-17.2 13.7-21.1.3-.2.7-.3 1-.5.8 13.2 7.3 26.6 18.8 29.5 12.6 3.3 30.7-7.5 38.4-16.3 9-.3 15.7-.9 22.6 5.1 9.9 8.5 7.1 30.3 17.1 41.6 10.6 11.6 14 19.5 13.7 24.6zM173.3 148.7c2 1.9 4.7 4.5 8 7.1 6.6 5.2 15.8 10.6 27.3 10.6 11.6 0 22.5-5.9 31.8-10.8 4.9-2.6 10.9-7 14.8-10.4s5.9-6.3 3.1-6.6-2.6 2.6-6 5.1c-4.4 3.2-9.7 7.4-13.9 9.8-7.4 4.2-19.5 10.2-29.9 10.2s-18.7-4.8-24.9-9.7c-3.1-2.5-5.7-5-7.7-6.9-1.5-1.4-1.9-4.6-4.3-4.9-1.4-.1-1.8 3.7 1.7 6.5z"></path></svg>
+</a>
+    国光的 PVE 环境搭建教程
+  </label>
+<div class="md-nav__source">
+<a class="md-source" data-md-component="source" href="https://github.com/sqlsec/PVE" title="前往仓库">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"></path></svg>
+</div>
+<div class="md-source__repository">
+    sqlsec/PVE
+  </div>
+</a>
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
+<a class="md-nav__link md-nav__link--active" href=".">
+        主页
+      </a>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2">
+          准备工作
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="准备工作" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+          准备工作
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="1/1/">
+        硬件配置
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="1/2/">
+        系统选择
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="1/3/">
+        磁盘划分
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="1/4/">
+        架构规划
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3">
+          PVE 基础
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="PVE 基础" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+          PVE 基础
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="2/1/">
+        BIOS设置
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="2/2/">
+        系统安装
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="2/3/">
+        基础设置
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="2/4/">
+        常用命令
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="2/5/">
+        来宾代理
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="2/6/">
+        华南排错
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" id="__nav_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4">
+          网络划分
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="网络划分" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+          网络划分
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="3/1/">
+        网络架构
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="3/2/">
+        网络实战
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" id="__nav_5" type="checkbox"/>
+<label class="md-nav__link" for="__nav_5">
+          PEV 进阶
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="PEV 进阶" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+          PEV 进阶
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="4/1/">
+        添加硬盘
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="4/2/">
+        硬件直通
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="4/3/">
+        配置证书
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="4/4/">
+        硬盘迁移
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="4/5/">
+        vGPU教程
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="4/6/">
+        功耗节能
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" id="__nav_6" type="checkbox"/>
+<label class="md-nav__link" for="__nav_6">
+          软路由
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="软路由" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_6">
+<span class="md-nav__icon md-icon"></span>
+          软路由
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="5/1/">
+        基本操作
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="5/2/">
+        硬盘扩容
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="5/3/">
+        OpenClash
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="5/4.md">
+        IPv6 配置
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" id="__nav_7" type="checkbox"/>
+<label class="md-nav__link" for="__nav_7">
+          黑群晖
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="黑群晖" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_7">
+<span class="md-nav__icon md-icon"></span>
+          黑群晖
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="6/1/">
+        基本安装
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="6/2/">
+        存储划分
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="6/3/">
+        SSD缓存
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="6/4/">
+        CPU修正
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="6/5/">
+        直通独显
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="6/6/">
+        远程访问
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="6/7/">
+        添加证书
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="6/8/">
+        WebDAV
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="6/9/">
+        安装 alist
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="6/10/">
+        终端美化
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="6/11/">
+        Docker与IPv6
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" id="__nav_8" type="checkbox"/>
+<label class="md-nav__link" for="__nav_8">
+          黑苹果
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="黑苹果" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_8">
+<span class="md-nav__icon md-icon"></span>
+          黑苹果
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="7/1/">
+        准备工作
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="7/2/">
+        修正配置
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="7/3/">
+        系统安装
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="7/4/">
+        系统优化
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" id="__nav_9" type="checkbox"/>
+<label class="md-nav__link" for="__nav_9">
+          远程穿透
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="远程穿透" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_9">
+<span class="md-nav__icon md-icon"></span>
+          远程穿透
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="8/1/">
+        NAT类型
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="8/2/">
+        ZeroTier
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="8/3/">
+        IPv6 DDNS
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="8/4/">
+        远程桌面
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" id="__nav_10" type="checkbox"/>
+<label class="md-nav__link" for="__nav_10">
+          IPv6 专题
+          <span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-label="IPv6 专题" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_10">
+<span class="md-nav__icon md-icon"></span>
+          IPv6 专题
+        </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="9/1/">
+        IPv6 基础
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="9/2/">
+        IPv6 场景
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="9/3/">
+        IPv6 使用
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="9/4/">
+        IPv6 普及
+      </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="9/5/">
+        IPv6与光猫
+      </a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="目录" class="md-nav md-nav--secondary">
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+</article>
+</div>
+</div>
+</main>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "search.suggest", "search.highlight", "search.share", "content.code.annotate"], "search": "assets/javascripts/workers/search.ecf98df9.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\s\\-\uff0c\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version.title": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+<script src="assets/javascripts/bundle.d691e9de.min.js"></script>
+<script async="async" data-fontsize="15px" data-mobile="false" data-random="false" data-text="OpenCore,Hackintosh,DSDT,SSDT,Kernel,Kexts,UEFI,NVRAM,BIOS,ACPI,Clover,AWAC,XOSI,Lilu.kext,VirtualSMC.kext,WhateverGreen.kext" id="click-show-text" src="https://html.sqlsec.com/click-show-text.min.js"></script>
+<script src="overrides/assets/javascripts/bundle.a3d871f9.min.js"></script>
+<script>document$.subscribe(() => {const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});})</script></body>
+</html>
