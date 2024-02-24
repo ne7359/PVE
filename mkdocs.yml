@@ -68,7 +68,7 @@ extra:
   generator: false
   social:
     - icon: fontawesome/brands/redhat
-      link: https://www.sqlsec.com
+      link: https://pve.leertai.top
       name: 国光
 nav:
   - "index.md"
